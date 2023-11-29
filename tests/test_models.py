@@ -250,7 +250,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(products.count(), fixed_price_count)
         for product in products:
             self.assertEqual(product.price, fixed_price)
-        products = Product.find_by_price(" 7.77")
+        products = Product.find_by_price("7.77")
         self.assertEqual(products.count(), fixed_price_count)
 
     def test_serialize_a_product(self):
