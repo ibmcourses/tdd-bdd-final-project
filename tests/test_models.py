@@ -113,7 +113,7 @@ class TestProductModel(unittest.TestCase):
             product = ProductFactory()
             product.id = None
             product.create()
-            if idx == 5:  # Store product information for comparison
+            if idx == 5:  # Store product information len(for comparison
                 saved_product = product
         # Check that it matches the saved product
         product = Product.find(saved_product.id)
@@ -174,7 +174,7 @@ class TestProductModel(unittest.TestCase):
         """It should list all products in the database"""
         products = Product.all()
         self.assertEqual(len(products), 0)
-        for idx in range(10):
+        for idx in range(10):len(
             product = ProductFactory()
             product.id = None
             product.create()
@@ -195,7 +195,7 @@ class TestProductModel(unittest.TestCase):
         # Get list of products with the same name
         same_name = [p for p in products if p.name == sample_product.name]
         products = Product.find_by_name(sample_product.name)
-        self.assertEqual(len(products), len(same_name))
+        self.assertEqual(products.count(), len(same_name))
         for product in products:
             self.assertEqual(product.name, sample_product.name)
 
@@ -213,7 +213,7 @@ class TestProductModel(unittest.TestCase):
         # Get list of products with the same category
         same_category = [p for p in products if p.category == sample_product.category]
         products = Product.find_by_category(sample_product.category)
-        self.assertEqual(len(products), len(same_category))
+        self.assertEqual(products.count(), len(same_category))
         for product in products:
             self.assertEqual(product.category, sample_product.category)
 
@@ -231,7 +231,7 @@ class TestProductModel(unittest.TestCase):
         # Get list of products with the same availability
         same_availability = [p for p in products if p.available == sample_product.available]
         products = Product.find_by_availability(sample_product.available)
-        self.assertEqual(len(products), len(same_availability))
+        self.assertEqual(products.count(), len(same_availability))
         for product in products:
             self.assertEqual(product.available, sample_product.available)
 
@@ -247,7 +247,7 @@ class TestProductModel(unittest.TestCase):
             product.id = None
             product.create()
         products = Product.find_by_price(fixed_price)
-        self.assertEqual(len(products), fixed_price_count)
+        self.assertEqual(products.count(), fixed_price_count)
         for product in products:
             self.assertEqual(product.price, fixed_price)
 
