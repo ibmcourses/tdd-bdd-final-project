@@ -239,19 +239,25 @@ class TestProductModel(unittest.TestCase):
         """It should Find products by Price"""
         fixed_price_count = 0
         fixed_price = Decimal(7.77)
+        str_fixed_price_count = 0
+        str_fixed_price = Decimal("7.77")
         for idx in range(50):
             product = ProductFactory()
-            if random.choice([True, False]):
+            tag = random.choice([0, 1, 2, 3, 4, 5])
+            if tag == 0:
                 product.price = fixed_price
                 fixed_price_count += 1
+            elif tag == 3:
+                product.price = str_fixed_price
+                str_fixed_price_count += 1
             product.id = None
             product.create()
         products = Product.find_by_price(fixed_price)
         self.assertEqual(products.count(), fixed_price_count)
         for product in products:
             self.assertEqual(product.price, fixed_price)
-        products = Product.find_by_price("7.77")
-        self.assertEqual(products.count(), fixed_price_count)
+        products = Product.find_by_price("   7.77  ")
+        self.assertEqual(products.count(), str_fixed_price_count)
 
     def test_serialize_a_product(self):
         """It should Serialize a product"""
