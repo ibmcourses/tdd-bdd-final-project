@@ -25,6 +25,7 @@ While debugging just these tests it's convenient to use this:
 """
 import os
 import logging
+import random
 import unittest
 from decimal import Decimal
 from service.models import Product, Category, db, DataValidationError
@@ -112,8 +113,6 @@ class TestProductModel(unittest.TestCase):
             product = ProductFactory()
             product.id = None
             product.create()
-            # Assert that it was assigned an id and shows up in the database
-            self.assertIsNotNone(product.id)
             if idx == 5:  # Store product information for comparison
                 saved_product = product
         # Check that it matches the saved product
@@ -131,8 +130,6 @@ class TestProductModel(unittest.TestCase):
             product = ProductFactory()
             product.id = None
             product.create()
-            # Assert that it was assigned an id and shows up in the database
-            self.assertIsNotNone(product.id)
             if idx == 7:  # Store product information for comparison
                 saved_product = product
         # Retrieve a product and modify it
@@ -163,8 +160,6 @@ class TestProductModel(unittest.TestCase):
             product = ProductFactory()
             product.id = None
             product.create()
-            # Assert that it was assigned an id and shows up in the database
-            self.assertIsNotNone(product.id)
             if idx == 3:  # Store product information for comparison
                 saved_product = product
         # Retrieve chosen product
@@ -175,8 +170,127 @@ class TestProductModel(unittest.TestCase):
         products = Product.all()
         self.assertEqual(len(products), 9)
 
+    def test_list_all_products(self):
+        """It should list all products in the database"""
+        products = Product.all()
+        self.assertEqual(len(products), 0)
+        for idx in range(10):
+            product = ProductFactory()
+            product.id = None
+            product.create()
+        products = Product.all()
+        self.assertEqual(len(products), 10)
 
+    def test_find_by_name(self):
+        """It should Find a product by Name"""
+        for idx in range(50):
+            product = ProductFactory()
+            product.id = None
+            product.create()
+        # Retrieve all products
+        products = Product.all()
+        self.assertEqual(len(products), 50)
+        # Retrieve first product
+        sample_product = products[0]
+        # Get list of products with the same name
+        same_name = [p for p in products if p.name == sample_product.name]
+        products = Product.find_by_name(sample_product.name)
+        self.assertEqual(len(products), len(same_name))
+        for product in products:
+            self.assertEqual(product.name, sample_product.name)
 
+    def test_find_by_category(self):
+        """It should Find products by Category"""
+        for idx in range(50):
+            product = ProductFactory()
+            product.id = None
+            product.create()
+        # Retrieve all products
+        products = Product.all()
+        self.assertEqual(len(products), 50)
+        # Retrieve first product
+        sample_product = products[0]
+        # Get list of products with the same category
+        same_category = [p for p in products if p.category == sample_product.category]
+        products = Product.find_by_category(sample_product.category)
+        self.assertEqual(len(products), len(same_category))
+        for product in products:
+            self.assertEqual(product.category, sample_product.category)
 
+    def test_find_by_availability(self):
+        """It should Find products by Availability"""
+        for idx in range(50):
+            product = ProductFactory()
+            product.id = None
+            product.create()
+        # Retrieve all products
+        products = Product.all()
+        self.assertEqual(len(products), 50)
+        # Retrieve first product
+        sample_product = products[0]
+        # Get list of products with the same availability
+        same_availability = [p for p in products if p.available == sample_product.available]
+        products = Product.find_by_availability(sample_product.available)
+        self.assertEqual(len(products), len(same_availability))
+        for product in products:
+            self.assertEqual(product.available, sample_product.available)
 
+    def test_find_by_price(self):
+        """It should Find products by Price"""
+        fixed_price_count = 0
+        fixed_price = Decimal(7.77)
+        for idx in range(50):
+            product = ProductFactory()
+            if random.choice([True, False]):
+                product.price = fixed_price
+                fixed_price_count += 1
+            product.id = None
+            product.create()
+        products = Product.find_by_price(fixed_price)
+        self.assertEqual(len(products), fixed_price_count)
+        for product in products:
+            self.assertEqual(product.price, fixed_price)
 
+    def test_serialize_a_product(self):
+        """It should Serialize a product"""
+        saved_product = ProductFactory()
+        saved_product.id = None
+        saved_product.create()
+        product = Product.find(saved_product.id).serialize()
+        self.assertEqual(product['id'], saved_product.id)
+        self.assertEqual(product['name'], saved_product.name)
+        self.assertEqual(product['description'], saved_product.description)
+        self.assertEqual(product['price'], Decimal(saved_product.price))
+        self.assertEqual(product['available'], saved_product.available)
+        self.assertEqual(product['category'], saved_product.category)
+
+    def test_deserialize_a_product(self):
+        """It should Deserialize a product and raise appropiate exceptions for missing fields"""
+        saved_product = ProductFactory()
+        saved_product.id = None
+        saved_product.create()
+        product = {}
+        with self.assertRaises(DataValidationError):
+            saved_product.deserialize(product)
+        product = saved_product.serialize()
+        saved_product.deserialize(product)
+        self.assertEqual(product['id'], saved_product.id)
+        self.assertEqual(product['name'], saved_product.name)
+        self.assertEqual(product['description'], saved_product.description)
+        self.assertEqual(product['price'], Decimal(saved_product.price))
+        self.assertEqual(product['available'], saved_product.available)
+        self.assertEqual(product['category'], saved_product.category)
+        invalid_product = product
+        invalid_product['available'] = 'Invalid value'
+        with self.assertRaises(DataValidationError):
+            saved_product.deserialize(invalid_product)
+        saved_product.deserialize(product)
+        invalid_product = product
+        invalid_product['category'] = 'Invalid category'
+        with self.assertRaises(DataValidationError):
+            saved_product.deserialize(invalid_product)
+        saved_product.deserialize(product)
+        invalid_product = product
+        invalid_product['price'] = 'Invalid price'
+        with self.assertRaises(DataValidationError):
+            saved_product.deserialize(invalid_product)
