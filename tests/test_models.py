@@ -104,3 +104,73 @@ class TestProductModel(unittest.TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+
+    def test_read_a_product(self):
+        """It should Read a product from the database"""
+        saved_product = None
+        for idx in range(10):
+            product = ProductFactory()
+            product.id = None
+            product.create()
+            # Assert that it was assigned an id and shows up in the database
+            self.assertIsNotNone(product.id)
+            if idx == 5:  # Store product information for comparison
+                saved_product = product
+        # Check that it matches the saved product
+        product = Product.find(saved_product.id)
+        self.assertEqual(product.name, saved_product.name)
+        self.assertEqual(product.description, saved_product.description)
+        self.assertEqual(product.price, Decimal(saved_product.price))
+        self.assertEqual(product.available, saved_product.available)
+        self.assertEqual(product.category, saved_product.category)
+
+    def test_update_a_product(self):
+        """It should Update a product in the database"""
+        saved_product = None
+        for idx in range(10):
+            product = ProductFactory()
+            product.id = None
+            product.create()
+            # Assert that it was assigned an id and shows up in the database
+            self.assertIsNotNone(product.id)
+            if idx == 7:  # Store product information for comparison
+                saved_product = product
+        # Retrieve a product and modify it
+        product = Product.find(saved_product.id)
+        product.name = 'Wheel'
+        product.price = Decimal(999.99)
+        product.update()
+        # Retrieve the same product and make sure that:
+        #     changed field match new values
+        #     old fields were not modified
+        product = Product.find(saved_product.id)
+        self.assertEqual(product.name, 'Wheel')
+        self.assertEqual(product.price, Decimal(999.99))
+        self.assertEqual(product.description, saved_product.description)
+        self.assertEqual(product.available, saved_product.available)
+        self.assertEqual(product.category, saved_product.category)
+
+    def test_delete_a_product(self):
+        """It should Delete a product in the database"""
+        saved_product = None
+        for idx in range(10):
+            product = ProductFactory()
+            product.id = None
+            product.create()
+            # Assert that it was assigned an id and shows up in the database
+            self.assertIsNotNone(product.id)
+            if idx == 3:  # Store product information for comparison
+                saved_product = product
+        # Retrieve chosen product
+        product = Product.find(saved_product.id)
+        product.delete()
+        product = Product.find(saved_product.id)
+        self.assertIsNone(product)
+        products = Product.all()
+        self.assertEqual(len(products), 9)
+
+
+
+
+
+
