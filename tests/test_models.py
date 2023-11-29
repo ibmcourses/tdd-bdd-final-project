@@ -154,7 +154,7 @@ class TestProductModel(unittest.TestCase):
         """It should fail trying to Update a product not saved to the database"""
         product = ProductFactory()
         product.id = None
-        self.assertRaises(DataValidationError, product.update())
+        self.assertRaises(DataValidationError, product.update)
 
     def test_delete_a_product(self):
         """It should Delete a product in the database"""
