@@ -174,7 +174,7 @@ class TestProductModel(unittest.TestCase):
         """It should list all products in the database"""
         products = Product.all()
         self.assertEqual(len(products), 0)
-        for idx in range(10):
+        for _ in range(10):
             product = ProductFactory()
             product.id = None
             product.create()
@@ -183,7 +183,7 @@ class TestProductModel(unittest.TestCase):
 
     def test_find_by_name(self):
         """It should Find a product by Name"""
-        for idx in range(50):
+        for _ in range(50):
             product = ProductFactory()
             product.id = None
             product.create()
@@ -201,7 +201,7 @@ class TestProductModel(unittest.TestCase):
 
     def test_find_by_category(self):
         """It should Find products by Category"""
-        for idx in range(50):
+        for _ in range(50):
             product = ProductFactory()
             product.id = None
             product.create()
@@ -219,7 +219,7 @@ class TestProductModel(unittest.TestCase):
 
     def test_find_by_availability(self):
         """It should Find products by Availability"""
-        for idx in range(50):
+        for _ in range(50):
             product = ProductFactory()
             product.id = None
             product.create()
@@ -241,7 +241,7 @@ class TestProductModel(unittest.TestCase):
         fixed_price = Decimal(7.77)
         str_fixed_price_count = 0
         str_fixed_price = Decimal("7.77")
-        for idx in range(50):
+        for _ in range(50):
             product = ProductFactory()
             tag = random.choice([0, 1, 2, 3, 4, 5])
             if tag == 0:
