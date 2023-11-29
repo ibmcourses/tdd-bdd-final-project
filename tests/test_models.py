@@ -174,7 +174,7 @@ class TestProductModel(unittest.TestCase):
         """It should list all products in the database"""
         products = Product.all()
         self.assertEqual(len(products), 0)
-        for idx in range(10):len(
+        for idx in range(10):
             product = ProductFactory()
             product.id = None
             product.create()
